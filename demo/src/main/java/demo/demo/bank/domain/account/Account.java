@@ -1,12 +1,12 @@
-package demo.demo.bank.account;
+package demo.demo.bank.domain.account;
 
+import demo.demo.bank.domain.user.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import demo.demo.bank.user.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;

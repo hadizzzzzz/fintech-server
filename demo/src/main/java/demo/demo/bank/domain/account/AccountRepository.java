@@ -1,4 +1,4 @@
-package demo.demo.bank.account;
+package demo.demo.bank.domain.account;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;
