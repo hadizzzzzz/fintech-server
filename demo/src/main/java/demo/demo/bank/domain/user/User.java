@@ -1,4 +1,4 @@
-package demo.demo.bank.user;
+package demo.demo.bank.domain.user;
 
 import lombok.Builder;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package demo.demo.bank.transaction;
+package demo.demo.bank.domain.transaction;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.repository.query.Param;

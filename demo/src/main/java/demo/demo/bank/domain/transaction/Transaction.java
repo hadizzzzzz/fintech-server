@@ -1,6 +1,6 @@
-package demo.demo.bank.transaction;
+package demo.demo.bank.domain.transaction;
 
-import demo.demo.bank.account.Account;
+import demo.demo.bank.domain.account.Account;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
