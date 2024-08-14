@@ -2,13 +2,18 @@ package demo.demo.bank.config;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import demo.demo.bank.config.jwt.JwtAuthenticationFilter;
+import demo.demo.bank.config.jwt.JwtAuthorizationFilter;
 import demo.demo.bank.dto.ResponseDto;
 import org.apache.coyote.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -31,16 +36,16 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // JWT 필터 등록이 필요함 : 임시 주석 처리
-//    public class CustomSecurityFilterManager extends AbstractHttpConfigurer<CustomSecurityFilterManager, HttpSecurity> {
-//        @Override
-//        public void configure(HttpSecurity builder) throws Exception {
-//            AuthenticationManager authenticationManager = builder.getSharedObject(AuthenticationManager.class);
-//            builder.addFilter(new JwtAuthenticationFilter(authenticationManager));
-//            builder.addFilter(new JwtAuthorizationFilter(authenticationManager));
-//            super.configure(builder);
-//        }
-//    }
+    // JWT 필터 등록이 필요함
+    public class CustomSecurityFilterManager extends AbstractHttpConfigurer<CustomSecurityFilterManager, HttpSecurity> {
+        @Override
+        public void configure(HttpSecurity builder) throws Exception {
+            AuthenticationManager authenticationManager = builder.getSharedObject(AuthenticationManager.class);
+            builder.addFilter(new JwtAuthenticationFilter(authenticationManager));
+            builder.addFilter(new JwtAuthorizationFilter(authenticationManager));
+            super.configure(builder);
+        }
+    }
 
     // JWT 서버를 만들 예정!! Session 사용안함.
     @Bean
@@ -57,6 +62,9 @@ public class SecurityConfig {
         // httpBasic은 브라우저가 팝업창을 이용해서 사용자 인증을 진행한다.
         http.httpBasic().disable();
 
+        // 필터 적용
+        http.apply(new CustomSecurityFilterManager());
+
         // Exception 가로 채기
         http.exceptionHandling().authenticationEntryPoint((request, response, authException) -> {
             String uri = request.getRequestURI();
@@ -64,19 +72,15 @@ public class SecurityConfig {
             CustomResponseUtil.unAuthentication(response, "로그인을 진행해주세요");
         });
 
-        // 임시 주석 처리
-//        // 필터 적용
-//        http.apply(new CustomSecurityFilterManager());
-//
-//        // 인증 실패
-//        http.exceptionHandling().authenticationEntryPoint((request, response, authException) -> {
-//            CustomResponseUtil.fail(response, "로그인을 진행해 주세요", HttpStatus.UNAUTHORIZED);
-//        });
-//
-//        // 권한 실패
-//        http.exceptionHandling().accessDeniedHandler((request, response, e) -> {
-//            CustomResponseUtil.fail(response, "권한이 없습니다", HttpStatus.FORBIDDEN);
-//        });
+        // 인증 실패
+        http.exceptionHandling().authenticationEntryPoint((request, response, authException) -> {
+            CustomResponseUtil.fail(response, "로그인을 진행해 주세요", HttpStatus.UNAUTHORIZED);
+        });
+
+       // 권한 실패
+        http.exceptionHandling().accessDeniedHandler((request, response, e) -> {
+            CustomResponseUtil.fail(response, "권한이 없습니다", HttpStatus.FORBIDDEN);
+        });
 
         // https://docs.spring.io/spring-security/reference/servlet/authorization/authorize-http-requests.html
         http.authorizeRequests()
